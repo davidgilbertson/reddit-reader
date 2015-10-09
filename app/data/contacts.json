@@ -1,0 +1,57 @@
+[
+  {
+    "firstName": "Bryan",
+    "lastName": "Lamar",
+    "email": "BryanLLamar@teleworm.us",
+    "stats": {
+      "steps": {
+        "wtd": 31450,
+        "mtd": 72640
+      }
+    }
+  },
+  {
+    "firstName": "Charles",
+    "lastName": "Suggs",
+    "email": "CharlesMSuggs@rhyta.com",
+    "stats": {
+      "steps": {
+        "wtd": 13000,
+        "mtd": 54640
+      }
+    }
+  },
+  {
+    "firstName": "Lisa",
+    "lastName": "Mitchell",
+    "email": "LisaJMitchell@rhyta.com",
+    "stats": {
+      "steps": {
+        "wtd": 39050,
+        "mtd": 65400
+      }
+    }
+  },
+  {
+    "firstName": "Manuel",
+    "lastName": "Hudson",
+    "email": "ManuelTHudson@teleworm.us",
+    "stats": {
+      "steps": {
+        "wtd": 33594,
+        "mtd": 54321
+      }
+    }
+  },
+  {
+    "firstName": "Edward",
+    "lastName": "Cosenza",
+    "email": "EdwardMCosenza@teleworm.us",
+    "stats": {
+      "steps": {
+        "wtd": 38000,
+        "mtd": 63401
+      }
+    }
+  }
+]
