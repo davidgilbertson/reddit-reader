@@ -33,13 +33,9 @@ class RedditList extends Component {
         this.state = {
             dataSource: new ListView.DataSource({
                 rowHasChanged: (row1, row2) => {
-                    console.log('  --  >  RedditList.android.js:36 > rowHasChanged > row1.isRead:', row1.isRead);
-                    console.log('  --  >  RedditList.android.js:36 > rowHasChanged > row2.isRead:', row2.isRead);
                     if (row1.isRead !== row2.isRead) {
-                        console.log('  --  >  RedditList.android.js:36 > rowHasChanged > HAS CHANGED');
                         return true;
                     } else {
-                        console.log('  --  >  RedditList.android.js:41 > rowHasChanged NO CHANGE');
                         return row1 !== row2;
                     }
                 },
@@ -108,6 +104,8 @@ class RedditList extends Component {
     }
 
     _markAsRead(story) {
+        // it seems that if I mutate this._data directly, then the rowHasChanged function
+        // has the updated data for both row1 and row2. I don't get it.
         var index = this._data.findIndex((item) => item.id === story.id);
 
         var newData = lodash.cloneDeep(this._data);
@@ -118,8 +116,6 @@ class RedditList extends Component {
         this.setState({
             dataSource: this.state.dataSource.cloneWithRows(newData),
         });
-
-
     }
 
     _renderStory(story, sectionId, rowId) {

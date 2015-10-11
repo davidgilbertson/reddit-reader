@@ -1,97 +1,146 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
-'use strict';
-
 var React = require('react-native');
+
 var {
     AppRegistry,
+    BackAndroid,
     Component,
-    View,
+    Dimensions,
+    DrawerLayoutAndroid,
     Navigator,
-    Text,
+    StyleSheet,
     } = React;
 
-//var routes = [
-//  {name: 'pageOne'},
-//  {name: 'pageTwo'},
-//];
-//
-//class PageOne extends Component{
-//  constructor(props) {
-//    super(props);
-//  }
-//
-//  render() {
-//    return (
-//      <View>
-//        <Text>PageOne</Text>
-//        <Text
-//            onPress={this.props.goTo.bind(null, {name: 'pageTwo'})}
-//            >
-//          Go to page two</Text>
-//      </View>
-//    );
-//  }
-//}
-//
-//class PageTwo extends Component{
-//  constructor(props) {
-//    super(props);
-//  }
-//
-//  render() {
-//    return (
-//        <View>
-//          <Text>PageTwo</Text>
-//          <Text
-//              onPress={this.props.goTo.bind(null, {name: 'pageOne'})}
-//              >
-//            Go to pageOne</Text>
-//        </View>
-//    );
-//  }
-//}
-//
-//class redditReader extends Component{
-//  constructor(props) {
-//    super(props);
-//
-//    this._renderScene = this._renderScene.bind(this);
-//    this._goTo = this._goTo.bind(this);
-//    this._nav;
-//  }
-//
-//  render() {
-//    return (
-//        <Navigator
-//            initialRoute={routes[0]}
-//            renderScene={this._renderScene}
-//            />
-//    );
-//  }
-//
-//  _goTo(route) {
-//    console.log('  --  >  index.android.js:72 > _goTo > route:', route);
-//    this._nav.push(route);
-//  }
-//
-//  _renderScene(route, nav) {
-//    this._nav = nav;
-//
-//    if (route.name === 'pageOne') {
-//      console.log('  --  >  index.android.js:69 > _renderScene');
-//      return <PageOne goTo={this._goTo} />;
-//    }
-//
-//    if (route.name === 'pageTwo') {
-//      console.log('  --  >  index.android.js:69 > _renderScene');
-//      return <PageTwo goTo={this._goTo} />;
-//    }
-//  }
-//}
+var TouchableNativeFeedback = require('TouchableNativeFeedback');
 
-var redditReader = require('./app/components/RedditReader.android.js');
+var Drawer = require('./app/components/Drawer');
+var NavBar = require('./app/components/NavBar');
 
-AppRegistry.registerComponent('redditReader', () => redditReader);
+var routeMap = require('./app/routeMap');
+var constants = require('./app/tools/constants');
+var scenes = constants.SCENES;
+
+class RedditReader extends Component {
+    constructor(props) {
+        super(props);
+        this._getActions = this._getActions.bind(this);
+        this._getNavBar = this._getNavBar.bind(this);
+        this._onDrawerClose = this._onDrawerClose.bind(this);
+        this._onSelectMenuItem = this._onSelectMenuItem.bind(this);
+        this._openDrawer = this._openDrawer.bind(this);
+        this._renderDrawer = this._renderDrawer.bind(this);
+        this._renderScene = this._renderScene.bind(this);
+
+        this.state = {
+            currentRoute: scenes[0],
+            navBarTitle: 'Reddit list',
+        };
+
+        this._drawer = null;
+        this._nav = null;
+        this._navToSceneWhenDrawerClosed = null;
+    }
+
+    componentDidMount() {
+        BackAndroid.addEventListener('hardwareBackPress', () => {
+            if (this._nav && this._nav.getCurrentRoutes().length > 1) {
+                this._nav.pop();
+
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    render() {
+        var width = Math.round(Dimensions.get('window').width * 0.8);
+
+        return (
+            <DrawerLayoutAndroid
+                ref={(ref) => {this._drawer = ref}}
+                drawerWidth={width}
+                renderNavigationView={this._renderDrawer}
+                onDrawerClose={this._onDrawerClose}
+                >
+                <Navigator
+                    initialRoute={scenes[0]}
+                    renderScene={this._renderScene}
+                    navigationBar={this._getNavBar()}
+                    style={styles.appWrapper}
+                    actions={this._getActions()}
+                    />
+            </DrawerLayoutAndroid>
+        );
+    }
+
+    _getActions() {
+        return {
+            setNavBarTitle: (title) => {
+                this.setState({navBarTitle: title});
+            }
+        }
+    }
+
+    _getNavBar() {
+        return (
+            <NavBar
+                onOpenSettings={this._openDrawer}
+                title={this.state.navBarTitle}
+                />
+        );
+    }
+
+    _onDrawerClose() {
+        if (this._navToSceneWhenDrawerClosed) {
+
+            this._nav.replace(this._navToSceneWhenDrawerClosed);
+
+            this.setState({
+                currentRoute: this._navToSceneWhenDrawerClosed,
+            });
+
+            this._navToSceneWhenDrawerClosed = null;
+        }
+
+    }
+
+    _onSelectMenuItem(scene) {
+        this._navToSceneWhenDrawerClosed = scene;
+        this._drawer.closeDrawer();
+    }
+
+    _openDrawer() {
+        this._drawer.openDrawer();
+    }
+
+    _renderDrawer() {
+        return (
+            <Drawer
+                onSelectItem={this._onSelectMenuItem}
+                currentRoute={this.state.currentRoute}
+                />
+        );
+    }
+
+    _renderScene(route, nav) {
+        this._nav = nav;
+
+        var Handler = routeMap.getRouteById(route.id).handler;
+
+        return (
+            <Handler
+                navigator={nav}
+                route={route}
+                actions={this._getActions()}
+                />
+        );
+    }
+}
+
+var styles = StyleSheet.create({
+    appWrapper: {
+        paddingTop: constants.dims.NAV_BAR_HEIGHT,
+    },
+});
+
+AppRegistry.registerComponent('redditReader', () => RedditReader);

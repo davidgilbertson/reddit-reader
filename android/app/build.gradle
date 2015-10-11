@@ -14,10 +14,19 @@ android {
             abiFilters "armeabi-v7a", "x86"
         }
     }
+    signingConfigs {
+        release {
+            storeFile file(REDDIT_READER_RELEASE_STORE_FILE)
+            storePassword REDDIT_READER_RELEASE_STORE_PASSWORD
+            keyAlias REDDIT_READER_RELEASE_KEY_ALIAS
+            keyPassword REDDIT_READER_RELEASE_KEY_PASSWORD
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
