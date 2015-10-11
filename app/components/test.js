@@ -12,7 +12,6 @@ var {
 var TouchableNativeFeedback = require('TouchableNativeFeedback');
 
 var Drawer = require('./Drawer');
-var NavBar = require('./NavBar');
 
 var routeMap = require('../routeMap');
 var constants = require('../tools/constants');
@@ -32,60 +31,15 @@ BackAndroid.addEventListener('hardwareBackPress', () => {
 });
 
 
-var routes = [
-  {name: 'pageOne'},
-  {name: 'pageTwo'},
-];
-
-class PageOne extends Component{
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <View>
-        <Text>PageOne</Text>
-        <Text
-            onPress={this.props.goTo.bind(null, {name: 'pageTwo'})}
-            >
-          Go to page two</Text>
-      </View>
-    );
-  }
-}
-
-class PageTwo extends Component{
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-        <View>
-          <Text>PageTwo</Text>
-          <Text
-              onPress={this.props.goTo.bind(null, {name: 'pageOne'})}
-              >
-            Go to pageOne</Text>
-        </View>
-    );
-  }
-}
-
-
 class RedditReader extends Component {
     constructor(props:any) {
         super(props);
         this._getActions = this._getActions.bind(this);
-        this._getNavBar = this._getNavBar.bind(this);
         this._onDrawerClose = this._onDrawerClose.bind(this);
         this._onSelectMenuItem = this._onSelectMenuItem.bind(this);
         this._openDrawer = this._openDrawer.bind(this);
         this._renderDrawer = this._renderDrawer.bind(this);
         this._renderScene = this._renderScene.bind(this);
-
-        this._drawer = null;
 
         this.state = {
             currentRoute: scenes[0],
@@ -100,7 +54,7 @@ class RedditReader extends Component {
 
         return (
             <DrawerLayoutAndroid
-                ref={(ref) => {this._drawer = ref}}
+                ref={'DRAWER_REF'}
                 drawerWidth={width}
                 renderNavigationView={this._renderDrawer}
                 onDrawerClose={this._onDrawerClose}
@@ -108,14 +62,13 @@ class RedditReader extends Component {
                 <Navigator
                     initialRoute={scenes[0]}
                     renderScene={this._renderScene}
-                    navigationBar={this._getNavBar()}
                     style={styles.appWrapper}
-                    //configureScene={(route) => {
-                    //  if (route.sceneConfig) {
-                    //    return route.sceneConfig;
-                    //  }
-                    //  return Navigator.SceneConfigs.FadeAndroid;
-                    //}}
+                    configureScene={(route) => {
+                      if (route.sceneConfig) {
+                        return route.sceneConfig;
+                      }
+                      return Navigator.SceneConfigs.FadeAndroid;
+                    }}
                     actions={this._getActions()}
                     />
             </DrawerLayoutAndroid>
@@ -130,19 +83,13 @@ class RedditReader extends Component {
         }
     }
 
-    _getNavBar() {
-        return (
-            <NavBar
-                onOpenSettings={this._openDrawer}
-                title={this.state.navBarTitle}
-                />
-        );
-    }
-
     _onDrawerClose() {
         if (this._navToSceneWhenDrawerClosed) {
+            //var route = this._navToSceneWhenDrawerClosed;
+            //route.sceneConfig = Navigator.SceneConfigs.FloatFromBottom;
+            //_nav.push(route);
 
-            _nav.replace(this._navToSceneWhenDrawerClosed);
+            _nav.push(this._navToSceneWhenDrawerClosed);
 
             this.setState({
                 currentRoute: this._navToSceneWhenDrawerClosed,
@@ -155,11 +102,11 @@ class RedditReader extends Component {
 
     _onSelectMenuItem(scene) {
         this._navToSceneWhenDrawerClosed = scene;
-        this._drawer.closeDrawer();
+        this.refs['DRAWER_REF'].closeDrawer();
     }
 
     _openDrawer() {
-        this._drawer.openDrawer();
+        this.refs['DRAWER_REF'].openDrawer();
     }
 
     _renderDrawer() {
@@ -172,6 +119,7 @@ class RedditReader extends Component {
     }
 
     _renderScene(route, nav) {
+        console.log('  --  >  RedditReader.android.js:124 > _renderScene', performance.now().toLocaleString());
         _nav = nav;
 
         var Handler = routeMap.getRouteById(route.id).handler;

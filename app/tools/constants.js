@@ -23,7 +23,7 @@ var constants = {
         GREY_400: GREY_400,
         GREY_700: GREY_700,
         GREY_900: GREY_900,
-        TEXT: GREY_900,
+        TEXT: GREY_700,
         TEXT_LIGHT: GREY_400,
         BLACK: '#000000',
         PRIMARY: INDIGO_500,

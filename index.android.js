@@ -6,49 +6,91 @@
 
 var React = require('react-native');
 var {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-} = React;
+    AppRegistry,
+    Component,
+    View,
+    Navigator,
+    Text,
+    } = React;
 
-//var redditReader = React.createClass({
-//  render: function() {
+//var routes = [
+//  {name: 'pageOne'},
+//  {name: 'pageTwo'},
+//];
+//
+//class PageOne extends Component{
+//  constructor(props) {
+//    super(props);
+//  }
+//
+//  render() {
 //    return (
-//      <View style={styles.container}>
-//        <Text style={styles.welcome}>
-//          Welcome to React Native!
-//        </Text>
-//        <Text style={styles.instructions}>
-//          To get started, edit index.android.js
-//        </Text>
-//        <Text style={styles.instructions}>
-//          Shake or press menu button for dev menu
-//        </Text>
+//      <View>
+//        <Text>PageOne</Text>
+//        <Text
+//            onPress={this.props.goTo.bind(null, {name: 'pageTwo'})}
+//            >
+//          Go to page two</Text>
 //      </View>
 //    );
 //  }
-//});
+//}
 //
-//var styles = StyleSheet.create({
-//  container: {
-//    flex: 1,
-//    justifyContent: 'center',
-//    alignItems: 'center',
-//    backgroundColor: '#F5FCFF',
-//  },
-//  welcome: {
-//    fontSize: 20,
-//    textAlign: 'center',
-//    margin: 10,
-//  },
-//  instructions: {
-//    textAlign: 'center',
-//    color: '#333333',
-//    marginBottom: 5,
-//  },
-//});
-
+//class PageTwo extends Component{
+//  constructor(props) {
+//    super(props);
+//  }
+//
+//  render() {
+//    return (
+//        <View>
+//          <Text>PageTwo</Text>
+//          <Text
+//              onPress={this.props.goTo.bind(null, {name: 'pageOne'})}
+//              >
+//            Go to pageOne</Text>
+//        </View>
+//    );
+//  }
+//}
+//
+//class redditReader extends Component{
+//  constructor(props) {
+//    super(props);
+//
+//    this._renderScene = this._renderScene.bind(this);
+//    this._goTo = this._goTo.bind(this);
+//    this._nav;
+//  }
+//
+//  render() {
+//    return (
+//        <Navigator
+//            initialRoute={routes[0]}
+//            renderScene={this._renderScene}
+//            />
+//    );
+//  }
+//
+//  _goTo(route) {
+//    console.log('  --  >  index.android.js:72 > _goTo > route:', route);
+//    this._nav.push(route);
+//  }
+//
+//  _renderScene(route, nav) {
+//    this._nav = nav;
+//
+//    if (route.name === 'pageOne') {
+//      console.log('  --  >  index.android.js:69 > _renderScene');
+//      return <PageOne goTo={this._goTo} />;
+//    }
+//
+//    if (route.name === 'pageTwo') {
+//      console.log('  --  >  index.android.js:69 > _renderScene');
+//      return <PageTwo goTo={this._goTo} />;
+//    }
+//  }
+//}
 
 var redditReader = require('./app/components/RedditReader.android.js');
 

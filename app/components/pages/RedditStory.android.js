@@ -37,6 +37,9 @@ class RedditStory extends Component {
 
     render() {
         var story = this._normalizeStory(this.props.route.story);
+
+        console.log('  --  >  RedditStory.android.js:41 > render > story:', story);
+
         var statText = `${story.subreddit} | ${story.score} points | ${story.num_comments} comments | by ${story.author}`;
 
         return (

@@ -6,6 +6,7 @@ var {
     Component,
     Image,
     ListView,
+    PanResponder,
     PixelRatio,
     ProgressBarAndroid,
     StyleSheet,
@@ -14,23 +15,34 @@ var {
     View,
     } = React;
 
+var lodash = require('lodash');
+
 var TouchableNativeFeedback = require('TouchableNativeFeedback');
 
 var Toolbar = require('./../NavBar');
-
-var REDDIT_DATA_MOCK = require('./../../data/reddit.new.json');
+var RedditListItem = require('../RedditListItem.android');
 var constants = require('../../tools/constants');
 
 class RedditList extends Component {
     constructor(props:any) {
         super(props);
         this._getStories = this._getStories.bind(this);
-        this._onEndReached = this._onEndReached.bind(this);
         this._renderStory = this._renderStory.bind(this);
+        this._markAsRead = this._markAsRead.bind(this);
 
         this.state = {
             dataSource: new ListView.DataSource({
-                rowHasChanged: (row1, row2) => row1 !== row2,
+                rowHasChanged: (row1, row2) => {
+                    console.log('  --  >  RedditList.android.js:36 > rowHasChanged > row1.isRead:', row1.isRead);
+                    console.log('  --  >  RedditList.android.js:36 > rowHasChanged > row2.isRead:', row2.isRead);
+                    if (row1.isRead !== row2.isRead) {
+                        console.log('  --  >  RedditList.android.js:36 > rowHasChanged > HAS CHANGED');
+                        return true;
+                    } else {
+                        console.log('  --  >  RedditList.android.js:41 > rowHasChanged NO CHANGE');
+                        return row1 !== row2;
+                    }
+                },
             }),
             loaded: false,
             listing: 'hot',
@@ -40,7 +52,6 @@ class RedditList extends Component {
 
         this._loading = false;
         this._after = null;
-        this._before = null;
     }
 
     componentDidMount() {
@@ -62,7 +73,7 @@ class RedditList extends Component {
                     dataSource={this.state.dataSource}
                     renderRow={this._renderStory}
                     style={styles.listView}
-                    onEndReached={this._onEndReached}
+                    onEndReached={this._getStories}
                     />
             </View>
         );
@@ -82,9 +93,10 @@ class RedditList extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 this._after = responseData.data.after;
-                this._before = responseData.data.before;
 
-                this._data = this._data.concat(responseData.data.children);
+                var stories = responseData.data.children.map((story) => story.data);
+
+                this._data = this._data.concat(stories);
 
                 this.setState({
                     dataSource: this.state.dataSource.cloneWithRows(this._data),
@@ -95,52 +107,33 @@ class RedditList extends Component {
             .done();
     }
 
-    _onEndReached(e) {
-        console.log('  --  >  RedditList.android.js:80 > _onEndReached > e:', e);
-        this._getStories();
-    }
+    _markAsRead(story) {
+        var index = this._data.findIndex((item) => item.id === story.id);
 
-    _onSelectStory(story) {
-        this.props.navigator.push({
-            id: 'redditStory',
-            story: story,
+        var newData = lodash.cloneDeep(this._data);
+        newData[index].isRead = true;
+
+        this._data = newData;
+
+        this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(newData),
         });
+
+
     }
 
-    _getThumbnail(story) {
-        if (!story.thumbnail || story.thumbnail.match(/default|self/)) return null;
-        return story.thumbnail;
-    }
-
-    _renderStory(story) {
-        // TODO (davidg): three actions:
-        // swipe left: mark as read
-        // swipe right: go to permalink w/ comments
-        // click, go to source URL
-
-        story = story.data;
-
-        var thumbnailUrl = this._getThumbnail(story);
-        var statText = `${story.subreddit} | ${story.score} points | ${story.num_comments} comments`;
+    _renderStory(story, sectionId, rowId) {
+        if (story.isRead) {
+            // TODO (davidg): render a placeholder that transforms to 0 height
+            return null;
+        }
 
         return (
-            <TouchableNativeFeedback
-                onPress={this._onSelectStory.bind(this, story)}
-                background={TouchableNativeFeedback.Ripple()}
-                >
-                <View style={styles.storyContainer}>
-                    <Image
-                        style={styles.thumbnail}
-                        source={{uri: thumbnailUrl}}
-                        />
-
-                    <View style={styles.rightContainer}>
-                        <Text style={styles.title}>{story.title}</Text>
-
-                        <Text style={styles.stats}>{statText}</Text>
-                    </View>
-                </View>
-            </TouchableNativeFeedback>
+            <RedditListItem
+                {...this.props}
+                story={story}
+                markAsRead={this._markAsRead}
+                />
         );
     }
 
@@ -149,6 +142,10 @@ class RedditList extends Component {
 module.exports = RedditList;
 
 var styles = StyleSheet.create({
+    storyWrapper: {
+        flex: 1,
+        backgroundColor: constants.colors.WHITE,
+    },
     page: {
         flex: 1,
     },
