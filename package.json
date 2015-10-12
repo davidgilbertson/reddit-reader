@@ -5,8 +5,8 @@
   "scripts": {
     "install-dev": "react-native run-android",
     "start": "node node_modules/react-native/packager/packager.js",
-    "get-js": "curl \"http://localhost:8081/index.android.bundle?platform=android&dev=false&minify=true\" -o \"android/app/src/main/assets/index.android.bundle\"",
-    "assemble": "cd android && gradlew assembleRelease && cd ..",
+    "bundle-js": "curl \"http://localhost:8081/index.android.bundle?platform=android&dev=false&minify=true\" -o \"android/app/src/main/assets/index.android.bundle\"",
+    "preinstall": "cd android && gradlew assembleRelease && cd ..",
     "install": "cd android && gradlew installRelease && cd .."
   },
   "dependencies": {

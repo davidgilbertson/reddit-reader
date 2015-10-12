@@ -10,8 +10,6 @@ var {
     StyleSheet,
     } = React;
 
-var TouchableNativeFeedback = require('TouchableNativeFeedback');
-
 var Drawer = require('./app/components/Drawer');
 var NavBar = require('./app/components/NavBar');
 

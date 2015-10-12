@@ -14,16 +14,15 @@ var {
     View,
     } = React;
 
-
 class Drawer extends Component {
     constructor(props) {
         super(props);
     }
 
     render() {
-        const currentRoute = this.props.currentRoute;
+        var currentRoute = this.props.currentRoute || {};
 
-        const menuItems = constants.SCENES.map((item, i) => {
+        var menuItems = constants.SCENES.map((item, i) => {
             var active = item.id === currentRoute.id;
 
             return (
